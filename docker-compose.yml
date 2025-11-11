@@ -23,6 +23,17 @@ services:
       - "5558:5558"
     restart: unless-stopped
 
+  # Servidor de Referência - Coordenação e sincronização (Python)
+  referencia:
+    build: ./referencia
+    container_name: referencia
+    networks:
+      - mensagens-net
+    ports:
+      - "5559:5559"
+      - "5560:5560"
+    restart: unless-stopped
+
   # Servidor - Processa requisições (Python)
   servidor:
     build: ./servidor
@@ -33,9 +44,12 @@ services:
     environment:
       - BROKER_ADDRESS=tcp://broker:5556
       - PROXY_ADDRESS=tcp://proxy:5557
+      - REFERENCE_ADDRESS=tcp://referencia:5559
+      - SERVER_NAME=servidor_${REPLICA:-1}
     depends_on:
       - broker
       - proxy
+      - referencia
     restart: unless-stopped
     deploy:
       replicas: 1
@@ -53,6 +67,7 @@ services:
       - broker
       - proxy
       - servidor
+      - referencia
     stdin_open: true
     tty: true
 
@@ -68,6 +83,7 @@ services:
       - broker
       - proxy
       - servidor
+      - referencia
     restart: unless-stopped
     deploy:
       replicas: 2

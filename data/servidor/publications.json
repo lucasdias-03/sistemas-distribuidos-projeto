@@ -1,7 +1,7 @@
 {
   "service": "publish",
   "data": {
-    "timestamp": "2025-11-11T05:41:39.500153",
+    "timestamp": "2025-11-11T15:17:02.825999",
     "publications": [
       {
         "channel": "Channel teste 2",
@@ -722,6 +722,342 @@
         "user": "bot_n7ythl",
         "message": "Bot ativo e operacional",
         "timestamp": "2025-11-11T05:41:39.499Z"
+      },
+      {
+        "channel": "Canal 3",
+        "user": "bot_jrj3uq",
+        "message": "Mensagem de teste #481",
+        "timestamp": "2025-11-11T15:16:06.510Z",
+        "clock": 181
+      },
+      {
+        "channel": "Canal 3",
+        "user": "bot_pz5nqr",
+        "message": "Heartbeat - sistema OK",
+        "timestamp": "2025-11-11T15:16:06.664Z",
+        "clock": 186
+      },
+      {
+        "channel": "Canal 3",
+        "user": "bot_jrj3uq",
+        "message": "Heartbeat - sistema OK",
+        "timestamp": "2025-11-11T15:16:08.517Z",
+        "clock": 192
+      },
+      {
+        "channel": "Canal 3",
+        "user": "bot_pz5nqr",
+        "message": "Mensagem de teste #675",
+        "timestamp": "2025-11-11T15:16:08.668Z",
+        "clock": 196
+      },
+      {
+        "channel": "Canal 3",
+        "user": "bot_jrj3uq",
+        "message": "Processando dados...",
+        "timestamp": "2025-11-11T15:16:10.525Z",
+        "clock": 200
+      },
+      {
+        "channel": "Canal 3",
+        "user": "bot_pz5nqr",
+        "message": "Bot ativo e operacional",
+        "timestamp": "2025-11-11T15:16:10.674Z",
+        "clock": 204
+      },
+      {
+        "channel": "Canal 3",
+        "user": "bot_jrj3uq",
+        "message": "Processando dados...",
+        "timestamp": "2025-11-11T15:16:12.533Z",
+        "clock": 208
+      },
+      {
+        "channel": "Canal 3",
+        "user": "bot_pz5nqr",
+        "message": "Checando conectividade do sistema",
+        "timestamp": "2025-11-11T15:16:12.681Z",
+        "clock": 212
+      },
+      {
+        "channel": "Canal 3",
+        "user": "bot_jrj3uq",
+        "message": "Bot ativo e operacional",
+        "timestamp": "2025-11-11T15:16:14.540Z",
+        "clock": 217
+      },
+      {
+        "channel": "Canal 3",
+        "user": "bot_pz5nqr",
+        "message": "Mensagem de teste #675",
+        "timestamp": "2025-11-11T15:16:14.687Z",
+        "clock": 221
+      },
+      {
+        "channel": "Canal 3",
+        "user": "bot_jrj3uq",
+        "message": "Enviando mais uma mensagem...",
+        "timestamp": "2025-11-11T15:16:16.549Z",
+        "clock": 225
+      },
+      {
+        "channel": "Canal 3",
+        "user": "bot_pz5nqr",
+        "message": "Tudo funcionando como esperado!",
+        "timestamp": "2025-11-11T15:16:16.693Z",
+        "clock": 229
+      },
+      {
+        "channel": "Canal 3",
+        "user": "bot_jrj3uq",
+        "message": "Ol\u00e1! Sou um bot automatizado \ud83e\udd16",
+        "timestamp": "2025-11-11T15:16:18.556Z",
+        "clock": 234
+      },
+      {
+        "channel": "Canal 3",
+        "user": "bot_pz5nqr",
+        "message": "Mensagem de teste #675",
+        "timestamp": "2025-11-11T15:16:18.698Z",
+        "clock": 238
+      },
+      {
+        "channel": "Canal 3",
+        "user": "bot_jrj3uq",
+        "message": "Bot ativo e operacional",
+        "timestamp": "2025-11-11T15:16:20.564Z",
+        "clock": 242
+      },
+      {
+        "channel": "Canal 3",
+        "user": "bot_pz5nqr",
+        "message": "Heartbeat - sistema OK",
+        "timestamp": "2025-11-11T15:16:20.705Z",
+        "clock": 246
+      },
+      {
+        "channel": "Canal 3",
+        "user": "bot_jrj3uq",
+        "message": "Heartbeat - sistema OK",
+        "timestamp": "2025-11-11T15:16:22.572Z",
+        "clock": 250
+      },
+      {
+        "channel": "Canal 3",
+        "user": "bot_pz5nqr",
+        "message": "Sistema funcionando perfeitamente!",
+        "timestamp": "2025-11-11T15:16:22.711Z",
+        "clock": 254
+      },
+      {
+        "channel": "Canal 3",
+        "user": "bot_jrj3uq",
+        "message": "Ol\u00e1! Sou um bot automatizado \ud83e\udd16",
+        "timestamp": "2025-11-11T15:16:24.580Z",
+        "clock": 259
+      },
+      {
+        "channel": "Canal 3",
+        "user": "bot_pz5nqr",
+        "message": "Bot ativo e operacional",
+        "timestamp": "2025-11-11T15:16:24.717Z",
+        "clock": 263
+      },
+      {
+        "channel": "Canal 2",
+        "user": "bot_jrj3uq",
+        "message": "Enviando mais uma mensagem...",
+        "timestamp": "2025-11-11T15:16:31.595Z",
+        "clock": 271
+      },
+      {
+        "channel": "Canal 2",
+        "user": "bot_pz5nqr",
+        "message": "Tudo funcionando como esperado!",
+        "timestamp": "2025-11-11T15:16:31.733Z",
+        "clock": 276
+      },
+      {
+        "channel": "Canal 2",
+        "user": "bot_jrj3uq",
+        "message": "Bot ativo e operacional",
+        "timestamp": "2025-11-11T15:16:33.602Z",
+        "clock": 281
+      },
+      {
+        "channel": "Canal 2",
+        "user": "bot_pz5nqr",
+        "message": "Mensagem de teste #675",
+        "timestamp": "2025-11-11T15:16:33.739Z",
+        "clock": 285
+      },
+      {
+        "channel": "Canal 2",
+        "user": "bot_jrj3uq",
+        "message": "Tudo funcionando como esperado!",
+        "timestamp": "2025-11-11T15:16:35.610Z",
+        "clock": 289
+      },
+      {
+        "channel": "Canal 2",
+        "user": "bot_pz5nqr",
+        "message": "Heartbeat - sistema OK",
+        "timestamp": "2025-11-11T15:16:35.746Z",
+        "clock": 293
+      },
+      {
+        "channel": "Canal 2",
+        "user": "bot_jrj3uq",
+        "message": "Tudo funcionando como esperado!",
+        "timestamp": "2025-11-11T15:16:37.618Z",
+        "clock": 297
+      },
+      {
+        "channel": "Canal 2",
+        "user": "bot_pz5nqr",
+        "message": "Bot ativo e operacional",
+        "timestamp": "2025-11-11T15:16:37.752Z",
+        "clock": 301
+      },
+      {
+        "channel": "Canal 2",
+        "user": "bot_jrj3uq",
+        "message": "Enviando mais uma mensagem...",
+        "timestamp": "2025-11-11T15:16:39.625Z",
+        "clock": 306
+      },
+      {
+        "channel": "Canal 2",
+        "user": "bot_pz5nqr",
+        "message": "Heartbeat - sistema OK",
+        "timestamp": "2025-11-11T15:16:39.759Z",
+        "clock": 310
+      },
+      {
+        "channel": "Canal 2",
+        "user": "bot_jrj3uq",
+        "message": "Mensagem de teste #481",
+        "timestamp": "2025-11-11T15:16:41.634Z",
+        "clock": 314
+      },
+      {
+        "channel": "Canal 2",
+        "user": "bot_pz5nqr",
+        "message": "Bot ativo e operacional",
+        "timestamp": "2025-11-11T15:16:41.765Z",
+        "clock": 318
+      },
+      {
+        "channel": "Canal 2",
+        "user": "bot_jrj3uq",
+        "message": "Ol\u00e1! Sou um bot automatizado \ud83e\udd16",
+        "timestamp": "2025-11-11T15:16:43.643Z",
+        "clock": 323
+      },
+      {
+        "channel": "Canal 2",
+        "user": "bot_pz5nqr",
+        "message": "Checando conectividade do sistema",
+        "timestamp": "2025-11-11T15:16:43.772Z",
+        "clock": 327
+      },
+      {
+        "channel": "Canal 2",
+        "user": "bot_jrj3uq",
+        "message": "Bot ativo e operacional",
+        "timestamp": "2025-11-11T15:16:45.651Z",
+        "clock": 331
+      },
+      {
+        "channel": "Canal 2",
+        "user": "bot_pz5nqr",
+        "message": "Processando dados...",
+        "timestamp": "2025-11-11T15:16:45.779Z",
+        "clock": 335
+      },
+      {
+        "channel": "Canal 2",
+        "user": "bot_jrj3uq",
+        "message": "Sistema funcionando perfeitamente!",
+        "timestamp": "2025-11-11T15:16:47.660Z",
+        "clock": 339
+      },
+      {
+        "channel": "Canal 2",
+        "user": "bot_pz5nqr",
+        "message": "Checando conectividade do sistema",
+        "timestamp": "2025-11-11T15:16:47.787Z",
+        "clock": 343
+      },
+      {
+        "channel": "Canal 2",
+        "user": "bot_jrj3uq",
+        "message": "Heartbeat - sistema OK",
+        "timestamp": "2025-11-11T15:16:49.669Z",
+        "clock": 348
+      },
+      {
+        "channel": "Canal 2",
+        "user": "bot_pz5nqr",
+        "message": "Ol\u00e1! Sou um bot automatizado \ud83e\udd16",
+        "timestamp": "2025-11-11T15:16:49.793Z",
+        "clock": 352
+      },
+      {
+        "channel": "Canal 3",
+        "user": "bot_jrj3uq",
+        "message": "Checando conectividade do sistema",
+        "timestamp": "2025-11-11T15:16:56.684Z",
+        "clock": 360
+      },
+      {
+        "channel": "Canal 2",
+        "user": "bot_pz5nqr",
+        "message": "Ol\u00e1! Sou um bot automatizado \ud83e\udd16",
+        "timestamp": "2025-11-11T15:16:56.804Z",
+        "clock": 367
+      },
+      {
+        "channel": "Canal 3",
+        "user": "bot_jrj3uq",
+        "message": "Enviando mais uma mensagem...",
+        "timestamp": "2025-11-11T15:16:58.692Z",
+        "clock": 372
+      },
+      {
+        "channel": "Canal 2",
+        "user": "bot_pz5nqr",
+        "message": "Sistema funcionando perfeitamente!",
+        "timestamp": "2025-11-11T15:16:58.811Z",
+        "clock": 376
+      },
+      {
+        "channel": "Canal 3",
+        "user": "bot_jrj3uq",
+        "message": "Checando conectividade do sistema",
+        "timestamp": "2025-11-11T15:17:00.700Z",
+        "clock": 380
+      },
+      {
+        "channel": "Canal 2",
+        "user": "bot_pz5nqr",
+        "message": "Sistema funcionando perfeitamente!",
+        "timestamp": "2025-11-11T15:17:00.817Z",
+        "clock": 384
+      },
+      {
+        "channel": "Canal 3",
+        "user": "bot_jrj3uq",
+        "message": "Bot ativo e operacional",
+        "timestamp": "2025-11-11T15:17:02.708Z",
+        "clock": 388
+      },
+      {
+        "channel": "Canal 2",
+        "user": "bot_pz5nqr",
+        "message": "Ol\u00e1! Sou um bot automatizado \ud83e\udd16",
+        "timestamp": "2025-11-11T15:17:02.824Z",
+        "clock": 392
       }
     ]
   }

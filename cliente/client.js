@@ -1,5 +1,6 @@
 const zmq = require('zeromq');
 const readline = require('readline');
+const msgpack = require('@msgpack/msgpack');
 
 class MessageClient {
     constructor() {
@@ -10,15 +11,28 @@ class MessageClient {
         this.proxyAddress = process.env.PROXY_ADDRESS || 'tcp://proxy:5558';
         this.subscribedChannels = [];
         
+        // Relógio lógico
+        this.logicalClock = 0;
+        
         this.rl = readline.createInterface({
             input: process.stdin,
             output: process.stdout
         });
     }
+    
+    incrementClock() {
+        this.logicalClock++;
+        return this.logicalClock;
+    }
+    
+    updateClock(receivedClock) {
+        this.logicalClock = Math.max(this.logicalClock, receivedClock) + 1;
+        return this.logicalClock;
+    }
 
     async connect() {
         await this.socket.connect(this.brokerAddress);
-        console.log(`Cliente conectado ao broker em ${this.brokerAddress}`);
+        console.log(`Cliente conectado ao broker em ${this.brokerAddress} (MessagePack + Relógio Lógico)`);
         
         await this.subSocket.connect(this.proxyAddress);
         console.log(`Cliente conectado ao proxy em ${this.proxyAddress}`);
@@ -43,17 +57,23 @@ class MessageClient {
         (async () => {
             for await (const [topic, msg] of this.subSocket) {
                 try {
-                    const data = JSON.parse(msg.toString());
+                    // Decodificar MessagePack
+                    const data = msgpack.decode(msg);
                     const topicStr = topic.toString();
+                    
+                    // Atualizar relógio lógico
+                    if (data.clock) {
+                        this.updateClock(data.clock);
+                    }
                     
                     if (topicStr === this.username) {
                         // Mensagem privada
                         console.log(`\n[MENSAGEM PRIVADA de ${data.from}]: ${data.message}`);
-                        console.log(`Timestamp: ${data.timestamp}\n`);
+                        console.log(`Timestamp: ${data.timestamp} | Clock: ${data.clock || 'N/A'}\n`);
                     } else {
                         // Publicação em canal
                         console.log(`\n[CANAL: ${topicStr}] ${data.user}: ${data.message}`);
-                        console.log(`Timestamp: ${data.timestamp}\n`);
+                        console.log(`Timestamp: ${data.timestamp} | Clock: ${data.clock || 'N/A'}\n`);
                     }
                 } catch (e) {
                     console.error('Erro ao processar mensagem:', e.message);
@@ -63,17 +83,29 @@ class MessageClient {
     }
 
     async sendRequest(service, data) {
+        const clock = this.incrementClock();
         const message = {
             service: service,
             data: {
                 ...data,
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toISOString(),
+                clock: clock
             }
         };
 
-        await this.socket.send(JSON.stringify(message));
+        // Enviar com MessagePack
+        await this.socket.send(msgpack.encode(message));
+        
+        // Receber com MessagePack
         const [response] = await this.socket.receive();
-        return JSON.parse(response.toString());
+        const decoded = msgpack.decode(response);
+        
+        // Atualizar relógio lógico
+        if (decoded.data && decoded.data.clock) {
+            this.updateClock(decoded.data.clock);
+        }
+        
+        return decoded;
     }
 
     async login() {
@@ -144,8 +176,8 @@ class MessageClient {
         try {
             const response = await this.sendRequest('channels', {});
             console.log('\n=== Canais Disponíveis ===');
-            if (response.data.channels && response.data.channels.length > 0) {
-                response.data.channels.forEach((channel, index) => {
+            if (response.data.users && response.data.users.length > 0) {
+                response.data.users.forEach((channel, index) => {
                     console.log(`${index + 1}. ${channel}`);
                 });
             } else {

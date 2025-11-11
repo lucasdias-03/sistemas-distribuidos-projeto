@@ -1,10 +1,10 @@
 {
   "service": "channels",
   "data": {
-    "timestamp": "2025-11-11T05:34:58.450091",
-    "channels": [
-      "Canal 1",
-      "canal 2"
+    "timestamp": "2025-11-11T15:16:08.349678",
+    "users": [
+      "Canal 3",
+      "Canal 2"
     ]
   }
 }

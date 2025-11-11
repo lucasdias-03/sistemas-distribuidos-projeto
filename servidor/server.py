@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 import zmq
-import json
+import json  # Mantido apenas para persistência em disco
+import msgpack
 import os
+import time
 from datetime import datetime
 from pathlib import Path
+from threading import Thread, Lock
 
 class MessageServer:
     def __init__(self, data_dir="/data"):
@@ -12,6 +15,19 @@ class MessageServer:
         
         # Socket PUB para publicações
         self.pub_socket = self.context.socket(zmq.PUB)
+        
+        # Socket REQ para comunicação com referência e outros servidores
+        self.req_socket = self.context.socket(zmq.REQ)
+        
+        # Relógio lógico
+        self.logical_clock = 0
+        self.clock_lock = Lock()
+        
+        # Informações do servidor
+        self.server_name = os.getenv("SERVER_NAME", f"servidor_{os.getpid()}")
+        self.rank = None
+        self.coordinator = None
+        self.message_count = 0  # Contador para sincronização a cada 10 mensagens
         
         self.data_dir = Path(data_dir)
         self.data_dir.mkdir(parents=True, exist_ok=True)
@@ -25,12 +41,84 @@ class MessageServer:
         
         # Carregar dados existentes
         self.users = self.load_data(self.users_file, [], 'users')
-        self.channels = self.load_data(self.channels_file, [], 'channels')
+        self.channels = self.load_data(self.channels_file, [], 'users')  # Note: usa 'users' conforme especificação
         self.logins = self.load_data(self.logins_file, [], 'logins')
         self.messages = self.load_data(self.messages_file, [], 'messages')
         self.publications = self.load_data(self.publications_file, [], 'publications')
         
         print(f"Servidor iniciado. Usuários: {len(self.users)}, Canais: {len(self.channels)}")
+    
+    def increment_clock(self):
+        """Incrementa relógio lógico antes de enviar mensagem"""
+        with self.clock_lock:
+            self.logical_clock += 1
+            return self.logical_clock
+    
+    def update_clock(self, received_clock):
+        """Atualiza relógio lógico ao receber mensagem"""
+        with self.clock_lock:
+            self.logical_clock = max(self.logical_clock, received_clock) + 1
+            return self.logical_clock
+    
+    def register_with_reference(self):
+        """Registra servidor com o servidor de referência e obtém rank"""
+        try:
+            ref_address = os.getenv("REFERENCE_ADDRESS", "tcp://referencia:5559")
+            ref_socket = self.context.socket(zmq.REQ)
+            ref_socket.connect(ref_address)
+            
+            clock = self.increment_clock()
+            request = {
+                "service": "rank",
+                "data": {
+                    "user": self.server_name,
+                    "timestamp": datetime.now().isoformat(),
+                    "clock": clock
+                }
+            }
+            
+            ref_socket.send(msgpack.packb(request))
+            response = msgpack.unpackb(ref_socket.recv(), raw=False)
+            
+            self.rank = response["data"]["rank"]
+            self.update_clock(response["data"]["clock"])
+            
+            print(f"Servidor '{self.server_name}' registrado com rank {self.rank}")
+            
+            ref_socket.close()
+            return True
+            
+        except Exception as e:
+            print(f"Erro ao registrar com referência: {e}")
+            return False
+    
+    def send_heartbeat(self):
+        """Thread para enviar heartbeat periódico"""
+        ref_address = os.getenv("REFERENCE_ADDRESS", "tcp://referencia:5559")
+        heartbeat_socket = self.context.socket(zmq.REQ)
+        heartbeat_socket.connect(ref_address)
+        
+        while True:
+            try:
+                time.sleep(5)  # Heartbeat a cada 5 segundos
+                
+                clock = self.increment_clock()
+                request = {
+                    "service": "heartbeat",
+                    "data": {
+                        "user": self.server_name,
+                        "timestamp": datetime.now().isoformat(),
+                        "clock": clock
+                    }
+                }
+                
+                heartbeat_socket.send(msgpack.packb(request))
+                response = msgpack.unpackb(heartbeat_socket.recv(), raw=False)
+                self.update_clock(response["data"]["clock"])
+                
+            except Exception as e:
+                print(f"Erro no heartbeat: {e}")
+                break
     
     def load_data(self, file_path, default, data_key=None):
         """Carrega dados do arquivo JSON"""
@@ -59,6 +147,10 @@ class MessageServer:
         """Processa login de usuário"""
         user = data.get("user")
         timestamp = data.get("timestamp")
+        received_clock = data.get("clock", 0)
+        
+        # Atualizar relógio lógico
+        current_clock = self.update_clock(received_clock)
         
         if not user:
             return {
@@ -66,7 +158,8 @@ class MessageServer:
                 "data": {
                     "status": "erro",
                     "timestamp": datetime.now().isoformat(),
-                    "description": "Nome de usuário não fornecido"
+                    "description": "Nome de usuário não fornecido",
+                    "clock": current_clock
                 }
             }
         
@@ -77,7 +170,8 @@ class MessageServer:
                 "data": {
                     "status": "erro",
                     "timestamp": datetime.now().isoformat(),
-                    "description": "Usuário já cadastrado"
+                    "description": "Usuário já cadastrado",
+                    "clock": current_clock
                 }
             }
         
@@ -106,23 +200,28 @@ class MessageServer:
         }
         self.save_data(self.logins_file, logins_data)
         
-        print(f"Login: {user} ({timestamp})")
+        print(f"Login: {user} ({timestamp}) - Clock: {current_clock}")
         
         return {
             "service": "login",
             "data": {
                 "status": "sucesso",
-                "timestamp": datetime.now().isoformat()
+                "timestamp": datetime.now().isoformat(),
+                "clock": current_clock
             }
         }
     
     def handle_users(self, data):
         """Retorna lista de usuários"""
+        received_clock = data.get("clock", 0)
+        current_clock = self.update_clock(received_clock)
+        
         return {
             "service": "users",
             "data": {
                 "timestamp": datetime.now().isoformat(),
-                "users": self.users
+                "users": self.users,
+                "clock": current_clock
             }
         }
     
@@ -130,6 +229,9 @@ class MessageServer:
         """Cria novo canal"""
         channel = data.get("channel")
         timestamp = data.get("timestamp")
+        received_clock = data.get("clock", 0)
+        
+        current_clock = self.update_clock(received_clock)
         
         if not channel:
             return {
@@ -137,7 +239,8 @@ class MessageServer:
                 "data": {
                     "status": "erro",
                     "timestamp": datetime.now().isoformat(),
-                    "description": "Nome do canal não fornecido"
+                    "description": "Nome do canal não fornecido",
+                    "clock": current_clock
                 }
             }
         
@@ -148,7 +251,8 @@ class MessageServer:
                 "data": {
                     "status": "erro",
                     "timestamp": datetime.now().isoformat(),
-                    "description": "Canal já existe"
+                    "description": "Canal já existe",
+                    "clock": current_clock
                 }
             }
         
@@ -158,28 +262,33 @@ class MessageServer:
             "service": "channels",
             "data": {
                 "timestamp": datetime.now().isoformat(),
-                "channels": self.channels
+                "users": self.channels
             }
         }
         self.save_data(self.channels_file, channels_data)
 
-        print(f"Canal criado: {channel} ({timestamp})")
+        print(f"Canal criado: {channel} ({timestamp}) - Clock: {current_clock}")
         
         return {
             "service": "channel",
             "data": {
                 "status": "sucesso",
-                "timestamp": datetime.now().isoformat()
+                "timestamp": datetime.now().isoformat(),
+                "clock": current_clock
             }
         }
     
     def handle_channels(self, data):
         """Retorna lista de canais"""
+        received_clock = data.get("clock", 0)
+        current_clock = self.update_clock(received_clock)
+        
         return {
             "service": "channels",
             "data": {
                 "timestamp": datetime.now().isoformat(),
-                "channels": self.channels
+                "users": self.channels,
+                "clock": current_clock
             }
         }
     
@@ -189,6 +298,9 @@ class MessageServer:
         channel = data.get("channel")
         message = data.get("message")
         timestamp = data.get("timestamp")
+        received_clock = data.get("clock", 0)
+        
+        current_clock = self.update_clock(received_clock)
         
         if not channel or not message:
             return {
@@ -196,7 +308,8 @@ class MessageServer:
                 "data": {
                     "status": "erro",
                     "timestamp": datetime.now().isoformat(),
-                    "message": "Canal ou mensagem não fornecidos"
+                    "message": "Canal ou mensagem não fornecidos",
+                    "clock": current_clock
                 }
             }
         
@@ -207,28 +320,32 @@ class MessageServer:
                 "data": {
                     "status": "erro",
                     "timestamp": datetime.now().isoformat(),
-                    "message": "Canal não existe"
+                    "message": "Canal não existe",
+                    "clock": current_clock
                 }
             }
         
         # Publicar no canal (tópico = nome do canal)
+        pub_clock = self.increment_clock()
         publication = {
             "user": user,
             "message": message,
-            "timestamp": timestamp
+            "timestamp": timestamp,
+            "clock": pub_clock
         }
         
-        # Enviar para o proxy Pub/Sub
+        # Enviar para o proxy Pub/Sub (MessagePack)
         topic = channel
         self.pub_socket.send_string(topic, zmq.SNDMORE)
-        self.pub_socket.send_json(publication)
+        self.pub_socket.send(msgpack.packb(publication))
         
         # Persistir publicação
         self.publications.append({
             "channel": channel,
             "user": user,
             "message": message,
-            "timestamp": timestamp
+            "timestamp": timestamp,
+            "clock": pub_clock
         })
         publications_data = {
             "service": "publish",
@@ -239,13 +356,14 @@ class MessageServer:
         }
         self.save_data(self.publications_file, publications_data)
         
-        print(f"Publicação no canal '{channel}' por {user}: {message}")
+        print(f"Publicação no canal '{channel}' por {user}: {message} - Clock: {pub_clock}")
         
         return {
             "service": "publish",
             "data": {
                 "status": "OK",
-                "timestamp": datetime.now().isoformat()
+                "timestamp": datetime.now().isoformat(),
+                "clock": current_clock
             }
         }
     
@@ -255,6 +373,9 @@ class MessageServer:
         dst = data.get("dst")
         message = data.get("message")
         timestamp = data.get("timestamp")
+        received_clock = data.get("clock", 0)
+        
+        current_clock = self.update_clock(received_clock)
         
         if not dst or not message:
             return {
@@ -262,7 +383,8 @@ class MessageServer:
                 "data": {
                     "status": "erro",
                     "timestamp": datetime.now().isoformat(),
-                    "message": "Destinatário ou mensagem não fornecidos"
+                    "message": "Destinatário ou mensagem não fornecidos",
+                    "clock": current_clock
                 }
             }
         
@@ -273,28 +395,32 @@ class MessageServer:
                 "data": {
                     "status": "erro",
                     "timestamp": datetime.now().isoformat(),
-                    "message": "Usuário não existe"
+                    "message": "Usuário não existe",
+                    "clock": current_clock
                 }
             }
         
         # Publicar para o usuário (tópico = nome do usuário)
+        msg_clock = self.increment_clock()
         private_message = {
             "from": src,
             "message": message,
-            "timestamp": timestamp
+            "timestamp": timestamp,
+            "clock": msg_clock
         }
         
-        # Enviar para o proxy Pub/Sub
+        # Enviar para o proxy Pub/Sub (MessagePack)
         topic = dst
         self.pub_socket.send_string(topic, zmq.SNDMORE)
-        self.pub_socket.send_json(private_message)
+        self.pub_socket.send(msgpack.packb(private_message))
         
         # Persistir mensagem
         self.messages.append({
             "src": src,
             "dst": dst,
             "message": message,
-            "timestamp": timestamp
+            "timestamp": timestamp,
+            "clock": msg_clock
         })
         messages_data = {
             "service": "message",
@@ -305,20 +431,22 @@ class MessageServer:
         }
         self.save_data(self.messages_file, messages_data)
         
-        print(f"Mensagem de {src} para {dst}: {message}")
+        print(f"Mensagem de {src} para {dst}: {message} - Clock: {msg_clock}")
         
         return {
             "service": "message",
             "data": {
                 "status": "OK",
-                "timestamp": datetime.now().isoformat()
+                "timestamp": datetime.now().isoformat(),
+                "clock": current_clock
             }
         }
     
     def process_request(self, message):
         """Processa requisição recebida"""
         try:
-            request = json.loads(message)
+            # Decodificar MessagePack
+            request = msgpack.unpackb(message, raw=False)
             service = request.get("service")
             data = request.get("data", {})
             
@@ -347,16 +475,6 @@ class MessageServer:
                     }
                 }
         
-        except json.JSONDecodeError as e:
-            print(f"Erro ao decodificar JSON: {e}")
-            return {
-                "service": "error",
-                "data": {
-                    "status": "erro",
-                    "timestamp": datetime.now().isoformat(),
-                    "description": "Formato de mensagem inválido"
-                }
-            }
         except Exception as e:
             print(f"Erro ao processar requisição: {e}")
             return {
@@ -380,18 +498,36 @@ class MessageServer:
         self.pub_socket.connect(proxy_address)
         print(f"Servidor conectado ao proxy em {proxy_address}")
         
-        print("Aguardando requisições...")
+        # Registrar com servidor de referência
+        print("Registrando com servidor de referência...")
+        if self.register_with_reference():
+            # Iniciar thread de heartbeat
+            heartbeat_thread = Thread(target=self.send_heartbeat, daemon=True)
+            heartbeat_thread.start()
+            print("Heartbeat iniciado")
+        else:
+            print("AVISO: Falha ao registrar com servidor de referência")
+        
+        print("Aguardando requisições... (usando MessagePack + Relógio Lógico)\n")
         
         try:
             while True:
-                # Receber requisição
-                message = self.socket.recv_string()
+                # Receber requisição (MessagePack binário)
+                message = self.socket.recv()
                 
                 # Processar requisição
                 response = self.process_request(message)
                 
-                # Enviar resposta
-                self.socket.send_json(response)
+                # Incrementar contador de mensagens
+                self.message_count += 1
+                
+                # Sincronizar relógio a cada 10 mensagens
+                if self.message_count >= 10:
+                    self.message_count = 0
+                    # TODO: Implementar sincronização com coordenador (Parte 4)
+                
+                # Enviar resposta (MessagePack binário)
+                self.socket.send(msgpack.packb(response))
         
         except KeyboardInterrupt:
             print("\nServidor encerrado")

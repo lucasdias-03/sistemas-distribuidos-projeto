@@ -1,7 +1,7 @@
 {
   "service": "login",
   "data": {
-    "timestamp": "2025-11-11T05:37:12.562907",
+    "timestamp": "2025-11-11T15:13:44.562791",
     "logins": [
       {
         "user": "Lucas",
@@ -34,6 +34,18 @@
       {
         "user": "Bob",
         "timestamp": "2025-11-11T05:37:12.558Z"
+      },
+      {
+        "user": "bot_jrj3uq",
+        "timestamp": "2025-11-11T15:13:18.255Z"
+      },
+      {
+        "user": "bot_pz5nqr",
+        "timestamp": "2025-11-11T15:13:18.426Z"
+      },
+      {
+        "user": "Everton",
+        "timestamp": "2025-11-11T15:13:44.558Z"
       }
     ]
   }
