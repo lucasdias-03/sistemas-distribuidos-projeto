@@ -1,0 +1,10 @@
+{
+  "service": "users",
+  "data": {
+    "timestamp": "2025-11-11T04:54:21.608464",
+    "users": [
+      "Lucas",
+      "Pedro"
+    ]
+  }
+}

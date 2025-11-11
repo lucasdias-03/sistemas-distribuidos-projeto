@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  # Broker - Intermediário entre clientes e servidores (Go)
+  broker:
+    build: ./broker
+    container_name: broker
+    networks:
+      - mensagens-net
+    ports:
+      - "5555:5555"
+      - "5556:5556"
+    restart: unless-stopped
+
+  # Servidor - Processa requisições (Python)
+  servidor:
+    build: ./servidor
+    networks:
+      - mensagens-net
+    volumes:
+      - ./data/servidor:/data
+    environment:
+      - BROKER_ADDRESS=tcp://broker:5556
+    depends_on:
+      - broker
+    restart: unless-stopped
+    deploy:
+      replicas: 1
+
+  # Cliente - Interface interativa (Node.js)
+  cliente:
+    build: ./cliente
+    container_name: cliente
+    networks:
+      - mensagens-net
+    environment:
+      - BROKER_ADDRESS=tcp://broker:5555
+    depends_on:
+      - broker
+      - servidor
+    stdin_open: true
+    tty: true
+
+networks:
+  mensagens-net:
+    driver: bridge
+
+volumes:
+  servidor-data:

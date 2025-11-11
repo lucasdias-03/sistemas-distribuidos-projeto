@@ -1,0 +1,16 @@
+{
+  "service": "login",
+  "data": {
+    "timestamp": "2025-11-11T04:54:21.610935",
+    "logins": [
+      {
+        "user": "Lucas",
+        "timestamp": "2025-11-11T04:54:10.391Z"
+      },
+      {
+        "user": "Pedro",
+        "timestamp": "2025-11-11T04:54:21.607Z"
+      }
+    ]
+  }
+}

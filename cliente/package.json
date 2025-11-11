@@ -1,0 +1,13 @@
+{
+  "name": "cliente-mensagens",
+  "version": "1.0.0",
+  "description": "Cliente para sistema de mensagens instantâneas",
+  "main": "client.js",
+  "scripts": {
+    "start": "node client.js"
+  },
+  "dependencies": {
+    "zeromq": "^6.0.0-beta.19",
+    "readline": "^1.3.0"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "service": "channels",
+  "data": {
+    "timestamp": "2025-11-11T04:55:01.478987",
+    "users": [
+      "Channel Teste 1",
+      "Channel teste 2"
+    ]
+  }
+}
