@@ -1,7 +1,7 @@
 {
   "service": "login",
   "data": {
-    "timestamp": "2025-11-11T04:54:21.610935",
+    "timestamp": "2025-11-11T05:37:12.562907",
     "logins": [
       {
         "user": "Lucas",
@@ -10,6 +10,30 @@
       {
         "user": "Pedro",
         "timestamp": "2025-11-11T04:54:21.607Z"
+      },
+      {
+        "user": "bot_xunyxc",
+        "timestamp": "2025-11-11T05:20:32.036Z"
+      },
+      {
+        "user": "bot_5ne19b",
+        "timestamp": "2025-11-11T05:20:32.199Z"
+      },
+      {
+        "user": "bot_8h2i",
+        "timestamp": "2025-11-11T05:34:14.781Z"
+      },
+      {
+        "user": "bot_n7ythl",
+        "timestamp": "2025-11-11T05:34:14.960Z"
+      },
+      {
+        "user": "Gabriel",
+        "timestamp": "2025-11-11T05:34:43.308Z"
+      },
+      {
+        "user": "Bob",
+        "timestamp": "2025-11-11T05:37:12.558Z"
       }
     ]
   }

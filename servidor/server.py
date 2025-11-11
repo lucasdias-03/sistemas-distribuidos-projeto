@@ -9,6 +9,10 @@ class MessageServer:
     def __init__(self, data_dir="/data"):
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.REP)
+        
+        # Socket PUB para publicações
+        self.pub_socket = self.context.socket(zmq.PUB)
+        
         self.data_dir = Path(data_dir)
         self.data_dir.mkdir(parents=True, exist_ok=True)
         
@@ -16,11 +20,15 @@ class MessageServer:
         self.users_file = self.data_dir / "users.json"
         self.channels_file = self.data_dir / "channels.json"
         self.logins_file = self.data_dir / "logins.json"
+        self.messages_file = self.data_dir / "messages.json"
+        self.publications_file = self.data_dir / "publications.json"
         
         # Carregar dados existentes
         self.users = self.load_data(self.users_file, [], 'users')
-        self.channels = self.load_data(self.channels_file, [], 'users')  # Note: usa 'users' conforme especificação
+        self.channels = self.load_data(self.channels_file, [], 'channels')
         self.logins = self.load_data(self.logins_file, [], 'logins')
+        self.messages = self.load_data(self.messages_file, [], 'messages')
+        self.publications = self.load_data(self.publications_file, [], 'publications')
         
         print(f"Servidor iniciado. Usuários: {len(self.users)}, Canais: {len(self.channels)}")
     
@@ -150,7 +158,7 @@ class MessageServer:
             "service": "channels",
             "data": {
                 "timestamp": datetime.now().isoformat(),
-                "users": self.channels
+                "channels": self.channels
             }
         }
         self.save_data(self.channels_file, channels_data)
@@ -171,7 +179,139 @@ class MessageServer:
             "service": "channels",
             "data": {
                 "timestamp": datetime.now().isoformat(),
-                "users": self.channels
+                "channels": self.channels
+            }
+        }
+    
+    def handle_publish(self, data):
+        """Publica mensagem em canal"""
+        user = data.get("user")
+        channel = data.get("channel")
+        message = data.get("message")
+        timestamp = data.get("timestamp")
+        
+        if not channel or not message:
+            return {
+                "service": "publish",
+                "data": {
+                    "status": "erro",
+                    "timestamp": datetime.now().isoformat(),
+                    "message": "Canal ou mensagem não fornecidos"
+                }
+            }
+        
+        # Verificar se canal existe
+        if channel not in self.channels:
+            return {
+                "service": "publish",
+                "data": {
+                    "status": "erro",
+                    "timestamp": datetime.now().isoformat(),
+                    "message": "Canal não existe"
+                }
+            }
+        
+        # Publicar no canal (tópico = nome do canal)
+        publication = {
+            "user": user,
+            "message": message,
+            "timestamp": timestamp
+        }
+        
+        # Enviar para o proxy Pub/Sub
+        topic = channel
+        self.pub_socket.send_string(topic, zmq.SNDMORE)
+        self.pub_socket.send_json(publication)
+        
+        # Persistir publicação
+        self.publications.append({
+            "channel": channel,
+            "user": user,
+            "message": message,
+            "timestamp": timestamp
+        })
+        publications_data = {
+            "service": "publish",
+            "data": {
+                "timestamp": datetime.now().isoformat(),
+                "publications": self.publications
+            }
+        }
+        self.save_data(self.publications_file, publications_data)
+        
+        print(f"Publicação no canal '{channel}' por {user}: {message}")
+        
+        return {
+            "service": "publish",
+            "data": {
+                "status": "OK",
+                "timestamp": datetime.now().isoformat()
+            }
+        }
+    
+    def handle_message(self, data):
+        """Envia mensagem privada para usuário"""
+        src = data.get("src")
+        dst = data.get("dst")
+        message = data.get("message")
+        timestamp = data.get("timestamp")
+        
+        if not dst or not message:
+            return {
+                "service": "message",
+                "data": {
+                    "status": "erro",
+                    "timestamp": datetime.now().isoformat(),
+                    "message": "Destinatário ou mensagem não fornecidos"
+                }
+            }
+        
+        # Verificar se usuário existe
+        if dst not in self.users:
+            return {
+                "service": "message",
+                "data": {
+                    "status": "erro",
+                    "timestamp": datetime.now().isoformat(),
+                    "message": "Usuário não existe"
+                }
+            }
+        
+        # Publicar para o usuário (tópico = nome do usuário)
+        private_message = {
+            "from": src,
+            "message": message,
+            "timestamp": timestamp
+        }
+        
+        # Enviar para o proxy Pub/Sub
+        topic = dst
+        self.pub_socket.send_string(topic, zmq.SNDMORE)
+        self.pub_socket.send_json(private_message)
+        
+        # Persistir mensagem
+        self.messages.append({
+            "src": src,
+            "dst": dst,
+            "message": message,
+            "timestamp": timestamp
+        })
+        messages_data = {
+            "service": "message",
+            "data": {
+                "timestamp": datetime.now().isoformat(),
+                "messages": self.messages
+            }
+        }
+        self.save_data(self.messages_file, messages_data)
+        
+        print(f"Mensagem de {src} para {dst}: {message}")
+        
+        return {
+            "service": "message",
+            "data": {
+                "status": "OK",
+                "timestamp": datetime.now().isoformat()
             }
         }
     
@@ -189,7 +329,9 @@ class MessageServer:
                 "login": self.handle_login,
                 "users": self.handle_users,
                 "channel": self.handle_channel,
-                "channels": self.handle_channels
+                "channels": self.handle_channels,
+                "publish": self.handle_publish,
+                "message": self.handle_message
             }
             
             handler = handlers.get(service)
@@ -232,6 +374,12 @@ class MessageServer:
         broker_address = os.getenv("BROKER_ADDRESS", "tcp://broker:5556")
         self.socket.connect(broker_address)
         print(f"Servidor conectado ao broker em {broker_address}")
+        
+        # Conectar ao proxy Pub/Sub
+        proxy_address = os.getenv("PROXY_ADDRESS", "tcp://proxy:5557")
+        self.pub_socket.connect(proxy_address)
+        print(f"Servidor conectado ao proxy em {proxy_address}")
+        
         print("Aguardando requisições...")
         
         try:
@@ -249,6 +397,7 @@ class MessageServer:
             print("\nServidor encerrado")
         finally:
             self.socket.close()
+            self.pub_socket.close()
             self.context.term()
 
 if __name__ == "__main__":

@@ -1,10 +1,16 @@
 {
   "service": "users",
   "data": {
-    "timestamp": "2025-11-11T04:54:21.608464",
+    "timestamp": "2025-11-11T05:37:12.560951",
     "users": [
       "Lucas",
-      "Pedro"
+      "Pedro",
+      "bot_xunyxc",
+      "bot_5ne19b",
+      "bot_8h2i",
+      "bot_n7ythl",
+      "Gabriel",
+      "Bob"
     ]
   }
 }

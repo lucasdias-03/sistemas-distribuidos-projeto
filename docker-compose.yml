@@ -12,6 +12,17 @@ services:
       - "5556:5556"
     restart: unless-stopped
 
+  # Proxy Pub/Sub - Para publicações e mensagens (Go)
+  proxy:
+    build: ./proxy
+    container_name: proxy
+    networks:
+      - mensagens-net
+    ports:
+      - "5557:5557"
+      - "5558:5558"
+    restart: unless-stopped
+
   # Servidor - Processa requisições (Python)
   servidor:
     build: ./servidor
@@ -21,8 +32,10 @@ services:
       - ./data/servidor:/data
     environment:
       - BROKER_ADDRESS=tcp://broker:5556
+      - PROXY_ADDRESS=tcp://proxy:5557
     depends_on:
       - broker
+      - proxy
     restart: unless-stopped
     deploy:
       replicas: 1
@@ -35,11 +48,29 @@ services:
       - mensagens-net
     environment:
       - BROKER_ADDRESS=tcp://broker:5555
+      - PROXY_ADDRESS=tcp://proxy:5558
     depends_on:
       - broker
+      - proxy
       - servidor
     stdin_open: true
     tty: true
+
+  # Bot - Cliente automatizado (Node.js)
+  bot:
+    build: ./bot
+    networks:
+      - mensagens-net
+    environment:
+      - BROKER_ADDRESS=tcp://broker:5555
+      - PROXY_ADDRESS=tcp://proxy:5558
+    depends_on:
+      - broker
+      - proxy
+      - servidor
+    restart: unless-stopped
+    deploy:
+      replicas: 2
 
 networks:
   mensagens-net:

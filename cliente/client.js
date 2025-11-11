@@ -4,8 +4,11 @@ const readline = require('readline');
 class MessageClient {
     constructor() {
         this.socket = new zmq.Request();
+        this.subSocket = new zmq.Subscriber();
         this.username = null;
         this.brokerAddress = process.env.BROKER_ADDRESS || 'tcp://broker:5555';
+        this.proxyAddress = process.env.PROXY_ADDRESS || 'tcp://proxy:5558';
+        this.subscribedChannels = [];
         
         this.rl = readline.createInterface({
             input: process.stdin,
@@ -16,6 +19,47 @@ class MessageClient {
     async connect() {
         await this.socket.connect(this.brokerAddress);
         console.log(`Cliente conectado ao broker em ${this.brokerAddress}`);
+        
+        await this.subSocket.connect(this.proxyAddress);
+        console.log(`Cliente conectado ao proxy em ${this.proxyAddress}`);
+    }
+    
+    async subscribeToUser() {
+        // Inscrever-se para receber mensagens privadas (tópico = nome do usuário)
+        if (this.username) {
+            this.subSocket.subscribe(this.username);
+            console.log(`Inscrito para receber mensagens privadas como '${this.username}'`);
+        }
+    }
+    
+    async subscribeToChannel(channel) {
+        this.subSocket.subscribe(channel);
+        this.subscribedChannels.push(channel);
+        console.log(`\n✓ Inscrito no canal '${channel}'\n`);
+    }
+    
+    async startListening() {
+        // Listener assíncrono para mensagens publicadas
+        (async () => {
+            for await (const [topic, msg] of this.subSocket) {
+                try {
+                    const data = JSON.parse(msg.toString());
+                    const topicStr = topic.toString();
+                    
+                    if (topicStr === this.username) {
+                        // Mensagem privada
+                        console.log(`\n[MENSAGEM PRIVADA de ${data.from}]: ${data.message}`);
+                        console.log(`Timestamp: ${data.timestamp}\n`);
+                    } else {
+                        // Publicação em canal
+                        console.log(`\n[CANAL: ${topicStr}] ${data.user}: ${data.message}`);
+                        console.log(`Timestamp: ${data.timestamp}\n`);
+                    }
+                } catch (e) {
+                    console.error('Erro ao processar mensagem:', e.message);
+                }
+            }
+        })();
     }
 
     async sendRequest(service, data) {
@@ -42,6 +86,8 @@ class MessageClient {
 
                     if (response.data.status === 'sucesso') {
                         this.username = username;
+                        await this.subscribeToUser();
+                        await this.startListening();
                         console.log(`\n✓ Login realizado com sucesso! Bem-vindo, ${username}!\n`);
                         resolve(true);
                     } else {
@@ -98,8 +144,8 @@ class MessageClient {
         try {
             const response = await this.sendRequest('channels', {});
             console.log('\n=== Canais Disponíveis ===');
-            if (response.data.users && response.data.users.length > 0) {
-                response.data.users.forEach((channel, index) => {
+            if (response.data.channels && response.data.channels.length > 0) {
+                response.data.channels.forEach((channel, index) => {
                     console.log(`${index + 1}. ${channel}`);
                 });
             } else {
@@ -110,12 +156,78 @@ class MessageClient {
             console.error('Erro ao listar canais:', error.message);
         }
     }
+    
+    async subscribeChannel() {
+        return new Promise((resolve) => {
+            this.rl.question('Digite o nome do canal para se inscrever: ', async (channel) => {
+                try {
+                    await this.subscribeToChannel(channel);
+                } catch (error) {
+                    console.error('Erro ao se inscrever:', error.message);
+                }
+                resolve();
+            });
+        });
+    }
+    
+    async publishToChannel() {
+        return new Promise((resolve) => {
+            this.rl.question('Digite o nome do canal: ', async (channel) => {
+                this.rl.question('Digite a mensagem: ', async (message) => {
+                    try {
+                        const response = await this.sendRequest('publish', {
+                            user: this.username,
+                            channel: channel,
+                            message: message
+                        });
+
+                        if (response.data.status === 'OK') {
+                            console.log(`\n✓ Mensagem publicada no canal '${channel}'\n`);
+                        } else {
+                            console.log(`\n✗ Erro: ${response.data.message}\n`);
+                        }
+                    } catch (error) {
+                        console.error('Erro ao publicar:', error.message);
+                    }
+                    resolve();
+                });
+            });
+        });
+    }
+    
+    async sendPrivateMessage() {
+        return new Promise((resolve) => {
+            this.rl.question('Digite o nome do destinatário: ', async (dst) => {
+                this.rl.question('Digite a mensagem: ', async (message) => {
+                    try {
+                        const response = await this.sendRequest('message', {
+                            src: this.username,
+                            dst: dst,
+                            message: message
+                        });
+
+                        if (response.data.status === 'OK') {
+                            console.log(`\n✓ Mensagem enviada para '${dst}'\n`);
+                        } else {
+                            console.log(`\n✗ Erro: ${response.data.message}\n`);
+                        }
+                    } catch (error) {
+                        console.error('Erro ao enviar mensagem:', error.message);
+                    }
+                    resolve();
+                });
+            });
+        });
+    }
 
     showMenu() {
         console.log('=== Menu ===');
         console.log('1. Listar usuários');
         console.log('2. Criar canal');
         console.log('3. Listar canais');
+        console.log('4. Inscrever em canal');
+        console.log('5. Publicar em canal');
+        console.log('6. Enviar mensagem privada');
         console.log('0. Sair');
         console.log('============\n');
     }
@@ -132,6 +244,15 @@ class MessageClient {
                         break;
                     case '3':
                         await this.listChannels();
+                        break;
+                    case '4':
+                        await this.subscribeChannel();
+                        break;
+                    case '5':
+                        await this.publishToChannel();
+                        break;
+                    case '6':
+                        await this.sendPrivateMessage();
                         break;
                     case '0':
                         console.log('Saindo...');
@@ -180,6 +301,7 @@ class MessageClient {
 
         this.rl.close();
         this.socket.close();
+        this.subSocket.close();
         console.log('Cliente encerrado.');
     }
 }
