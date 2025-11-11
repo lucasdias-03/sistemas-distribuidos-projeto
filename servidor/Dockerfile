@@ -18,4 +18,7 @@ COPY . .
 # Criar diretório para dados
 RUN mkdir -p /data
 
-CMD ["python", "server.py"]
+# Desabilitar buffering do Python para ver logs em tempo real
+ENV PYTHONUNBUFFERED=1
+
+CMD ["python", "-u", "server.py"]

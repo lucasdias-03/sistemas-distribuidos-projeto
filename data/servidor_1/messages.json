@@ -1,0 +1,15 @@
+{
+  "service": "message",
+  "data": {
+    "timestamp": "2025-11-11T21:15:27.789853",
+    "messages": [
+      {
+        "src": "Lucas",
+        "dst": "Fernando",
+        "message": "Ol\u00e1 Fernando!",
+        "timestamp": "2025-11-11T21:15:27.784Z",
+        "clock": 196
+      }
+    ]
+  }
+}

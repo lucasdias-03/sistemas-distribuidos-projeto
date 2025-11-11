@@ -34,25 +34,65 @@ services:
       - "5560:5560"
     restart: unless-stopped
 
-  # Servidor - Processa requisições (Python)
-  servidor:
+  # Servidor 1 - Processa requisições (Python)
+  servidor_1:
     build: ./servidor
+    container_name: servidor_1
     networks:
       - mensagens-net
     volumes:
-      - ./data/servidor:/data
+      - ./data/servidor_1:/data
     environment:
       - BROKER_ADDRESS=tcp://broker:5556
       - PROXY_ADDRESS=tcp://proxy:5557
+      - PROXY_SUB_ADDRESS=tcp://proxy:5558
       - REFERENCE_ADDRESS=tcp://referencia:5559
-      - SERVER_NAME=servidor_${REPLICA:-1}
+      - SERVER_NAME=servidor_1
     depends_on:
       - broker
       - proxy
       - referencia
     restart: unless-stopped
-    deploy:
-      replicas: 1
+
+  # Servidor 2 - Processa requisições (Python)
+  servidor_2:
+    build: ./servidor
+    container_name: servidor_2
+    networks:
+      - mensagens-net
+    volumes:
+      - ./data/servidor_2:/data
+    environment:
+      - BROKER_ADDRESS=tcp://broker:5556
+      - PROXY_ADDRESS=tcp://proxy:5557
+      - PROXY_SUB_ADDRESS=tcp://proxy:5558
+      - REFERENCE_ADDRESS=tcp://referencia:5559
+      - SERVER_NAME=servidor_2
+    depends_on:
+      - broker
+      - proxy
+      - referencia
+    restart: unless-stopped
+
+  # Servidor 3 - Processa requisições (Python)
+  servidor_3:
+    build: ./servidor
+    container_name: servidor_3
+    networks:
+      - mensagens-net
+    volumes:
+      - ./data/servidor_3:/data
+    environment:
+      - BROKER_ADDRESS=tcp://broker:5556
+      - PROXY_ADDRESS=tcp://proxy:5557
+      - PROXY_SUB_ADDRESS=tcp://proxy:5558
+      - REFERENCE_ADDRESS=tcp://referencia:5559
+      - SERVER_NAME=servidor_3
+    depends_on:
+      - broker
+      - proxy
+      - referencia
+    restart: unless-stopped
 
   # Cliente - Interface interativa (Node.js)
   cliente:
@@ -66,14 +106,17 @@ services:
     depends_on:
       - broker
       - proxy
-      - servidor
+      - servidor_1
+      - servidor_2
+      - servidor_3
       - referencia
     stdin_open: true
     tty: true
 
-  # Bot - Cliente automatizado (Node.js)
-  bot:
+  # Bot 1 - Cliente automatizado (Node.js)
+  bot_1:
     build: ./bot
+    container_name: bot_1
     networks:
       - mensagens-net
     environment:
@@ -82,11 +125,29 @@ services:
     depends_on:
       - broker
       - proxy
-      - servidor
+      - servidor_1
+      - servidor_2
+      - servidor_3
       - referencia
     restart: unless-stopped
-    deploy:
-      replicas: 2
+
+  # Bot 2 - Cliente automatizado (Node.js)
+  bot_2:
+    build: ./bot
+    container_name: bot_2
+    networks:
+      - mensagens-net
+    environment:
+      - BROKER_ADDRESS=tcp://broker:5555
+      - PROXY_ADDRESS=tcp://proxy:5558
+    depends_on:
+      - broker
+      - proxy
+      - servidor_1
+      - servidor_2
+      - servidor_3
+      - referencia
+    restart: unless-stopped
 
 networks:
   mensagens-net:

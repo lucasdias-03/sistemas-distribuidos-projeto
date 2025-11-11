@@ -1,0 +1,295 @@
+{
+  "service": "publish",
+  "data": {
+    "timestamp": "2025-11-11T21:17:21.059670",
+    "publications": [
+      {
+        "channel": "Canal 1",
+        "user": "bot_p8y0tr",
+        "message": "Tudo funcionando como esperado!",
+        "timestamp": "2025-11-11T21:14:33.411Z",
+        "clock": 85
+      },
+      {
+        "channel": "Canal 1",
+        "user": "bot_pzs1lp",
+        "message": "Bot ativo e operacional",
+        "timestamp": "2025-11-11T21:14:33.451Z",
+        "clock": 92
+      },
+      {
+        "channel": "Canal 1",
+        "user": "bot_p8y0tr",
+        "message": "Processando dados...",
+        "timestamp": "2025-11-11T21:14:41.424Z",
+        "clock": 105
+      },
+      {
+        "channel": "Canal 1",
+        "user": "bot_pzs1lp",
+        "message": "Enviando mais uma mensagem...",
+        "timestamp": "2025-11-11T21:14:41.456Z",
+        "clock": 109
+      },
+      {
+        "channel": "Canal 1",
+        "user": "bot_p8y0tr",
+        "message": "Checando conectividade do sistema",
+        "timestamp": "2025-11-11T21:14:49.438Z",
+        "clock": 118
+      },
+      {
+        "channel": "Canal 1",
+        "user": "bot_pzs1lp",
+        "message": "Mensagem de teste #739",
+        "timestamp": "2025-11-11T21:14:49.460Z",
+        "clock": 122
+      },
+      {
+        "channel": "Canal 1",
+        "user": "bot_p8y0tr",
+        "message": "Sistema funcionando perfeitamente!",
+        "timestamp": "2025-11-11T21:14:57.451Z",
+        "clock": 134
+      },
+      {
+        "channel": "Canal 1",
+        "user": "bot_pzs1lp",
+        "message": "Ol\u00e1! Sou um bot automatizado \ud83e\udd16",
+        "timestamp": "2025-11-11T21:14:57.464Z",
+        "clock": 138
+      },
+      {
+        "channel": "Canal 1",
+        "user": "bot_p8y0tr",
+        "message": "Bot ativo e operacional",
+        "timestamp": "2025-11-11T21:15:05.465Z",
+        "clock": 153
+      },
+      {
+        "channel": "Canal 1",
+        "user": "bot_pzs1lp",
+        "message": "Tudo funcionando como esperado!",
+        "timestamp": "2025-11-11T21:15:05.474Z",
+        "clock": 161
+      },
+      {
+        "channel": "Canal 1",
+        "user": "bot_p8y0tr",
+        "message": "Mensagem de teste #547",
+        "timestamp": "2025-11-11T21:15:13.479Z",
+        "clock": 168
+      },
+      {
+        "channel": "Canal 1",
+        "user": "bot_pzs1lp",
+        "message": "Processando dados...",
+        "timestamp": "2025-11-11T21:15:13.493Z",
+        "clock": 172
+      },
+      {
+        "channel": "Canal 1",
+        "user": "bot_p8y0tr",
+        "message": "Teste de mensagem autom\u00e1tica",
+        "timestamp": "2025-11-11T21:15:21.493Z",
+        "clock": 185
+      },
+      {
+        "channel": "Canal 1",
+        "user": "bot_pzs1lp",
+        "message": "Enviando mais uma mensagem...",
+        "timestamp": "2025-11-11T21:15:21.502Z",
+        "clock": 189
+      },
+      {
+        "channel": "Canal 1",
+        "user": "bot_p8y0tr",
+        "message": "Sistema funcionando perfeitamente!",
+        "timestamp": "2025-11-11T21:15:29.506Z",
+        "clock": 200
+      },
+      {
+        "channel": "Canal 1",
+        "user": "bot_pzs1lp",
+        "message": "Processando dados...",
+        "timestamp": "2025-11-11T21:15:29.516Z",
+        "clock": 204
+      },
+      {
+        "channel": "Canal 1",
+        "user": "bot_p8y0tr",
+        "message": "Enviando mais uma mensagem...",
+        "timestamp": "2025-11-11T21:15:37.520Z",
+        "clock": 214
+      },
+      {
+        "channel": "Canal 1",
+        "user": "bot_pzs1lp",
+        "message": "Tudo funcionando como esperado!",
+        "timestamp": "2025-11-11T21:15:37.529Z",
+        "clock": 218
+      },
+      {
+        "channel": "Canal 1",
+        "user": "bot_p8y0tr",
+        "message": "Ol\u00e1! Sou um bot automatizado \ud83e\udd16",
+        "timestamp": "2025-11-11T21:15:45.534Z",
+        "clock": 230
+      },
+      {
+        "channel": "Canal 1",
+        "user": "bot_pzs1lp",
+        "message": "Sistema funcionando perfeitamente!",
+        "timestamp": "2025-11-11T21:15:45.536Z",
+        "clock": 234
+      },
+      {
+        "channel": "Canal 1",
+        "user": "bot_pzs1lp",
+        "message": "Mensagem de teste #739",
+        "timestamp": "2025-11-11T21:16:08.564Z",
+        "clock": 254
+      },
+      {
+        "channel": "Canal 2",
+        "user": "bot_p8y0tr",
+        "message": "Ol\u00e1! Sou um bot automatizado \ud83e\udd16",
+        "timestamp": "2025-11-11T21:16:08.564Z",
+        "clock": 255
+      },
+      {
+        "channel": "Canal 2",
+        "user": "bot_p8y0tr",
+        "message": "Mensagem de teste #547",
+        "timestamp": "2025-11-11T21:16:16.664Z",
+        "clock": 265
+      },
+      {
+        "channel": "Canal 1",
+        "user": "bot_pzs1lp",
+        "message": "Heartbeat - sistema OK",
+        "timestamp": "2025-11-11T21:16:16.664Z",
+        "clock": 267
+      },
+      {
+        "channel": "Canal 1",
+        "user": "bot_pzs1lp",
+        "message": "Ol\u00e1! Sou um bot automatizado \ud83e\udd16",
+        "timestamp": "2025-11-11T21:16:24.769Z",
+        "clock": 275
+      },
+      {
+        "channel": "Canal 2",
+        "user": "bot_p8y0tr",
+        "message": "Checando conectividade do sistema",
+        "timestamp": "2025-11-11T21:16:24.769Z",
+        "clock": 276
+      },
+      {
+        "channel": "Canal 2",
+        "user": "bot_p8y0tr",
+        "message": "Teste de mensagem autom\u00e1tica",
+        "timestamp": "2025-11-11T21:16:32.803Z",
+        "clock": 287
+      },
+      {
+        "channel": "Canal 1",
+        "user": "bot_pzs1lp",
+        "message": "Bot ativo e operacional",
+        "timestamp": "2025-11-11T21:16:32.803Z",
+        "clock": 286
+      },
+      {
+        "channel": "Canal 2",
+        "user": "bot_p8y0tr",
+        "message": "Heartbeat - sistema OK",
+        "timestamp": "2025-11-11T21:16:40.915Z",
+        "clock": 298
+      },
+      {
+        "channel": "Canal 1",
+        "user": "bot_pzs1lp",
+        "message": "Sistema funcionando perfeitamente!",
+        "timestamp": "2025-11-11T21:16:40.915Z",
+        "clock": 297
+      },
+      {
+        "channel": "Canal 2",
+        "user": "bot_p8y0tr",
+        "message": "Processando dados...",
+        "timestamp": "2025-11-11T21:16:49.003Z",
+        "clock": 307
+      },
+      {
+        "channel": "Canal 1",
+        "user": "bot_pzs1lp",
+        "message": "Heartbeat - sistema OK",
+        "timestamp": "2025-11-11T21:16:49.003Z",
+        "clock": 305
+      },
+      {
+        "channel": "Canal 1",
+        "user": "Lucas",
+        "message": "Teste Canal 1 Lucas",
+        "timestamp": "2025-11-11T21:16:56.140Z",
+        "clock": 320
+      },
+      {
+        "channel": "Canal 1",
+        "user": "bot_pzs1lp",
+        "message": "Mensagem de teste #739",
+        "timestamp": "2025-11-11T21:16:57.010Z",
+        "clock": 325
+      },
+      {
+        "channel": "Canal 2",
+        "user": "bot_p8y0tr",
+        "message": "Mensagem de teste #547",
+        "timestamp": "2025-11-11T21:16:57.010Z",
+        "clock": 324
+      },
+      {
+        "channel": "Canal 1",
+        "user": "bot_pzs1lp",
+        "message": "Processando dados...",
+        "timestamp": "2025-11-11T21:17:05.024Z",
+        "clock": 340
+      },
+      {
+        "channel": "Canal 2",
+        "user": "bot_p8y0tr",
+        "message": "Ol\u00e1! Sou um bot automatizado \ud83e\udd16",
+        "timestamp": "2025-11-11T21:17:05.024Z",
+        "clock": 341
+      },
+      {
+        "channel": "Canal 1",
+        "user": "bot_pzs1lp",
+        "message": "Tudo funcionando como esperado!",
+        "timestamp": "2025-11-11T21:17:13.037Z",
+        "clock": 352
+      },
+      {
+        "channel": "Canal 2",
+        "user": "bot_p8y0tr",
+        "message": "Processando dados...",
+        "timestamp": "2025-11-11T21:17:13.037Z",
+        "clock": 351
+      },
+      {
+        "channel": "Canal 2",
+        "user": "bot_p8y0tr",
+        "message": "Heartbeat - sistema OK",
+        "timestamp": "2025-11-11T21:17:21.050Z",
+        "clock": 362
+      },
+      {
+        "channel": "Canal 1",
+        "user": "bot_pzs1lp",
+        "message": "Ol\u00e1! Sou um bot automatizado \ud83e\udd16",
+        "timestamp": "2025-11-11T21:17:21.050Z",
+        "clock": 364
+      }
+    ]
+  }
+}

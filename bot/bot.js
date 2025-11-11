@@ -192,14 +192,14 @@ class MessageBot {
             for (let i = 0; i < 10; i++) {
                 const message = this.getRandomMessage();
                 await this.publishMessage(channel, message);
-                
+
                 // Aguardar um pouco entre mensagens
-                await this.sleep(2000);
+                await this.sleep(8000);
             }
-            
+
             // 4. Aguardar antes de repetir o ciclo
             console.log('\nCiclo completo. Aguardando próximo ciclo...\n');
-            await this.sleep(5000);
+            await this.sleep(15000);
         }
     }
 
