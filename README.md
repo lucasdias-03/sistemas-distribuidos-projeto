@@ -1,1 +1,1 @@
-Projeto Sistemas
+Projeto Sistemas Distribuídos
