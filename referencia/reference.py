@@ -183,15 +183,15 @@ class ReferenceServer:
     
     def start(self):
         """Inicia o servidor de referência"""
-        # Bind REP socket
+        
         self.socket.bind("tcp://*:5559")
         print("Socket REP escutando na porta 5559")
         
-        # Bind PUB socket (para notificações de eleição, se necessário)
+        
         self.pub_socket.bind("tcp://*:5560")
         print("Socket PUB na porta 5560")
         
-        # Iniciar thread de limpeza
+        
         cleanup_thread = Thread(target=self.cleanup_servers, daemon=True)
         cleanup_thread.start()
         

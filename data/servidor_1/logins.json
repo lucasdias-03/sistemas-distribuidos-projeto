@@ -1,7 +1,7 @@
 {
   "service": "login",
   "data": {
-    "timestamp": "2025-11-11T21:15:15.648246",
+    "timestamp": "2025-11-12T22:47:37.842188",
     "logins": [
       {
         "user": "bot_jacft",
@@ -22,6 +22,46 @@
       {
         "user": "Fernando",
         "timestamp": "2025-11-11T21:15:15.624Z"
+      },
+      {
+        "user": "bot_96aged",
+        "timestamp": "2025-11-12T21:47:51.814Z"
+      },
+      {
+        "user": "bot_7r6vt",
+        "timestamp": "2025-11-12T21:47:51.845Z"
+      },
+      {
+        "user": "Leonardo",
+        "timestamp": "2025-11-12T21:49:40.709Z"
+      },
+      {
+        "user": "Pedro",
+        "timestamp": "2025-11-12T21:49:52.990Z"
+      },
+      {
+        "user": "bot_w94z29",
+        "timestamp": "2025-11-12T22:29:18.063Z"
+      },
+      {
+        "user": "bot_52wcfg",
+        "timestamp": "2025-11-12T22:29:18.063Z"
+      },
+      {
+        "user": "bot_777z9",
+        "timestamp": "2025-11-12T22:43:36.288Z"
+      },
+      {
+        "user": "bot_n6ve9",
+        "timestamp": "2025-11-12T22:43:36.362Z"
+      },
+      {
+        "user": "bot_g14agk",
+        "timestamp": "2025-11-12T22:47:33.236Z"
+      },
+      {
+        "user": "bot_zzk9ef",
+        "timestamp": "2025-11-12T22:47:33.257Z"
       }
     ]
   }

@@ -465,13 +465,8 @@ class MessageServer:
             }
 
             # Publicar no tópico 'servers'
-            print(f"[REPLICAÇÃO] Enviando {operation_type} de {self.server_name} (Clock: {clock})")
-            print(f"[REPLICAÇÃO] Dados: {operation_data}")
-
             self.pub_socket.send_string("servers", zmq.SNDMORE)
             self.pub_socket.send(msgpack.packb(replication_msg))
-
-            print(f"[REPLICAÇÃO] {operation_type} propagada com sucesso")
 
         except Exception as e:
             print(f"[REPLICAÇÃO] ERRO ao propagar {operation_type}: {e}")
@@ -486,35 +481,24 @@ class MessageServer:
             operation_data = data.get("operation_data")
             received_clock = data.get("clock", 0)
 
-            print(f"[REPLICAÇÃO] Recebida operação {operation} de {server} (Clock: {received_clock})")
-            print(f"[REPLICAÇÃO] Dados recebidos: {operation_data}")
-
             # Ignorar próprias operações
             if server == self.server_name:
-                print(f"[REPLICAÇÃO] Ignorando própria operação de {server}")
                 return
+
+            print(f"[REPLICAÇÃO] {operation} de {server}: {operation_data}")
 
             # Atualizar relógio lógico
             self.update_clock(received_clock)
 
             # Aplicar operação baseada no tipo
             if operation == "login":
-                print(f"[REPLICAÇÃO] Aplicando login replication...")
                 self._apply_login_replication(operation_data)
             elif operation == "channel":
-                print(f"[REPLICAÇÃO] Aplicando channel replication...")
                 self._apply_channel_replication(operation_data)
             elif operation == "publish":
-                print(f"[REPLICAÇÃO] Aplicando publish replication...")
                 self._apply_publish_replication(operation_data)
             elif operation == "message":
-                print(f"[REPLICAÇÃO] Aplicando message replication...")
                 self._apply_message_replication(operation_data)
-            else:
-                print(f"[REPLICAÇÃO] Operação desconhecida: {operation}")
-                return
-
-            print(f"[REPLICAÇÃO] {operation} aplicada com sucesso de {server}")
 
         except Exception as e:
             print(f"[REPLICAÇÃO] ERRO ao processar {operation}: {e}")
@@ -526,10 +510,7 @@ class MessageServer:
         user = data.get("user")
         timestamp = data.get("timestamp")
 
-        print(f"[REPLICAÇÃO] _apply_login_replication: user={user}, timestamp={timestamp}")
-
         if user and user not in self.users:
-            print(f"[REPLICAÇÃO] Adicionando usuário {user} aos usuários locais")
             self.users.append(user)
             users_data = {
                 "service": "users",
@@ -553,21 +534,12 @@ class MessageServer:
                 }
             }
             self.save_data(self.logins_file, logins_data)
-            print(f"[REPLICAÇÃO] Login de {user} replicado com sucesso")
-        else:
-            if not user:
-                print(f"[REPLICAÇÃO] AVISO: Usuário vazio na replicação de login")
-            else:
-                print(f"[REPLICAÇÃO] Usuário {user} já existe, ignorando replicação")
 
     def _apply_channel_replication(self, data):
         """Aplica replicação de criação de canal"""
         channel = data.get("channel")
 
-        print(f"[REPLICAÇÃO] _apply_channel_replication: channel={channel}")
-
         if channel and channel not in self.channels:
-            print(f"[REPLICAÇÃO] Adicionando canal {channel} aos canais locais")
             self.channels.append(channel)
             channels_data = {
                 "service": "channels",
@@ -577,12 +549,6 @@ class MessageServer:
                 }
             }
             self.save_data(self.channels_file, channels_data)
-            print(f"[REPLICAÇÃO] Canal {channel} replicado com sucesso")
-        else:
-            if not channel:
-                print(f"[REPLICAÇÃO] AVISO: Canal vazio na replicação")
-            else:
-                print(f"[REPLICAÇÃO] Canal {channel} já existe, ignorando replicação")
 
     def _apply_publish_replication(self, data):
         """Aplica replicação de publicação"""
@@ -591,8 +557,6 @@ class MessageServer:
         message = data.get("message")
         timestamp = data.get("timestamp")
         clock = data.get("clock")
-
-        print(f"[REPLICAÇÃO] _apply_publish_replication: channel={channel}, user={user}, message={message}")
 
         # Verificar se já existe (evitar duplicação)
         exists = any(
@@ -604,7 +568,6 @@ class MessageServer:
         )
 
         if not exists:
-            print(f"[REPLICAÇÃO] Adicionando publicação ao histórico")
             self.publications.append({
                 "channel": channel,
                 "user": user,
@@ -620,9 +583,6 @@ class MessageServer:
                 }
             }
             self.save_data(self.publications_file, publications_data)
-            print(f"[REPLICAÇÃO] Publicação replicada com sucesso")
-        else:
-            print(f"[REPLICAÇÃO] Publicação já existe, ignorando duplicação")
 
     def _apply_message_replication(self, data):
         """Aplica replicação de mensagem privada"""
@@ -631,8 +591,6 @@ class MessageServer:
         message = data.get("message")
         timestamp = data.get("timestamp")
         clock = data.get("clock")
-
-        print(f"[REPLICAÇÃO] _apply_message_replication: src={src}, dst={dst}, message={message}")
 
         # Verificar se já existe (evitar duplicação)
         exists = any(
@@ -644,7 +602,6 @@ class MessageServer:
         )
 
         if not exists:
-            print(f"[REPLICAÇÃO] Adicionando mensagem ao histórico")
             self.messages.append({
                 "src": src,
                 "dst": dst,
@@ -660,9 +617,6 @@ class MessageServer:
                 }
             }
             self.save_data(self.messages_file, messages_data)
-            print(f"[REPLICAÇÃO] Mensagem replicada com sucesso")
-        else:
-            print(f"[REPLICAÇÃO] Mensagem já existe, ignorando duplicação")
 
     def request_full_sync(self):
         """Solicita sincronização completa de dados de outro servidor"""
@@ -792,6 +746,25 @@ class MessageServer:
                 "logins": self.logins,
                 "messages": self.messages,
                 "publications": self.publications,
+                "timestamp": datetime.now().isoformat(),
+                "clock": current_clock
+            }
+        }
+
+    def handle_who_coordinator(self, data):
+        """Responde quem é o coordenador atual"""
+        received_clock = data.get("clock", 0)
+        current_clock = self.update_clock(received_clock)
+
+        with self.coordinator_lock:
+            coordinator = self.coordinator
+
+        return {
+            "service": "who_coordinator",
+            "data": {
+                "coordinator": coordinator,
+                "my_rank": self.rank,
+                "my_name": self.server_name,
                 "timestamp": datetime.now().isoformat(),
                 "clock": current_clock
             }
@@ -1039,8 +1012,6 @@ class MessageServer:
         }
         self.save_data(self.publications_file, publications_data)
 
-        print(f"Publicação no canal '{channel}' por {user}: {message} - Clock: {pub_clock}")
-
         # Replicar operação para outros servidores (síncrono)
         self.replicate_operation("publish", {
             "channel": channel,
@@ -1163,7 +1134,8 @@ class MessageServer:
                 "message": self.handle_message,
                 "election": self.handle_election_request,
                 "clock": self.handle_clock_request,
-                "sync": self.handle_sync_request
+                "sync": self.handle_sync_request,
+                "who_coordinator": self.handle_who_coordinator
             }
             
             handler = handlers.get(service)

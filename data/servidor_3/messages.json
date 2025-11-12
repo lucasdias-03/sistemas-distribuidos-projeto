@@ -1,7 +1,7 @@
 {
   "service": "message",
   "data": {
-    "timestamp": "2025-11-11T21:15:27.785903",
+    "timestamp": "2025-11-12T22:47:37.631530",
     "messages": [
       {
         "src": "Lucas",
@@ -9,6 +9,13 @@
         "message": "Ol\u00e1 Fernando!",
         "timestamp": "2025-11-11T21:15:27.784Z",
         "clock": 196
+      },
+      {
+        "src": "Pedro",
+        "dst": "Leonardo",
+        "message": "Ol\u00e1 Leonardo",
+        "timestamp": "2025-11-12T21:50:09.541Z",
+        "clock": 294
       }
     ]
   }

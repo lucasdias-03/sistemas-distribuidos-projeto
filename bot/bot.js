@@ -41,10 +41,8 @@ class MessageBot {
 
     async connect() {
         await this.socket.connect(this.brokerAddress);
-        console.log(`Bot conectado ao broker em ${this.brokerAddress} (MessagePack + Relógio Lógico)`);
-        
+
         await this.subSocket.connect(this.proxyAddress);
-        console.log(`Bot conectado ao proxy em ${this.proxyAddress}`);
     }
 
     async sendRequest(service, data) {
@@ -80,19 +78,15 @@ class MessageBot {
             });
 
             if (response.data.status === 'sucesso') {
-                console.log(`✓ Bot logado como: ${this.username}`);
-                
                 // Inscrever para receber mensagens
                 this.subSocket.subscribe(this.username);
                 this.startListening();
-                
+
                 return true;
             } else {
-                console.error(`✗ Erro no login: ${response.data.description}`);
                 return false;
             }
         } catch (error) {
-            console.error('Erro ao fazer login:', error.message);
             return false;
         }
     }
@@ -102,35 +96,25 @@ class MessageBot {
             const response = await this.sendRequest('channels', {});
             if (response.data.users && response.data.users.length > 0) {
                 this.channels = response.data.users;
-                console.log(`Canais disponíveis: ${this.channels.join(', ')}`);
-            } else {
-                console.log('Nenhum canal disponível ainda.');
             }
         } catch (error) {
-            console.error('Erro ao buscar canais:', error.message);
+            // Silenciar erro
         }
     }
 
     async subscribeToChannel(channel) {
         this.subSocket.subscribe(channel);
-        console.log(`Bot inscrito no canal: ${channel}`);
     }
 
     async publishMessage(channel, message) {
         try {
-            const response = await this.sendRequest('publish', {
+            await this.sendRequest('publish', {
                 user: this.username,
                 channel: channel,
                 message: message
             });
-
-            if (response.data.status === 'OK') {
-                console.log(`✓ Publicado no canal '${channel}': ${message}`);
-            } else {
-                console.error(`✗ Erro ao publicar: ${response.data.message}`);
-            }
         } catch (error) {
-            console.error('Erro ao publicar mensagem:', error.message);
+            // Silenciar erro
         }
     }
 
@@ -146,48 +130,38 @@ class MessageBot {
     startListening() {
         // Listener assíncrono para mensagens
         (async () => {
-            for await (const [topic, msg] of this.subSocket) {
+            for await (const [, msg] of this.subSocket) {
                 try {
                     // Decodificar MessagePack
                     const data = msgpack.decode(msg);
-                    const topicStr = topic.toString();
-                    
+
                     // Atualizar relógio lógico
                     if (data.clock) {
                         this.updateClock(data.clock);
                     }
-                    
-                    if (topicStr === this.username) {
-                        console.log(`[MENSAGEM PRIVADA de ${data.from}]: ${data.message} | Clock: ${data.clock || 'N/A'}`);
-                    } else {
-                        console.log(`[CANAL: ${topicStr}] ${data.user}: ${data.message} | Clock: ${data.clock || 'N/A'}`);
-                    }
                 } catch (e) {
-                    console.error('Erro ao processar mensagem:', e.message);
+                    // Silenciar erro
                 }
             }
         })();
     }
 
     async runLoop() {
-        console.log('\n=== Bot iniciando loop de publicações ===\n');
-        
         while (this.running) {
             // 1. Buscar canais disponíveis
             await this.getChannels();
-            
+
             if (this.channels.length === 0) {
-                console.log('Aguardando criação de canais...');
                 await this.sleep(5000);
                 continue;
             }
-            
+
             // 2. Escolher canal aleatório
             const channel = this.getRandomChannel();
-            
+
             // Inscrever no canal se ainda não estiver
             await this.subscribeToChannel(channel);
-            
+
             // 3. Enviar 10 mensagens
             for (let i = 0; i < 10; i++) {
                 const message = this.getRandomMessage();
@@ -198,7 +172,6 @@ class MessageBot {
             }
 
             // 4. Aguardar antes de repetir o ciclo
-            console.log('\nCiclo completo. Aguardando próximo ciclo...\n');
             await this.sleep(15000);
         }
     }
@@ -208,16 +181,11 @@ class MessageBot {
     }
 
     async start() {
-        console.log('=================================');
-        console.log('Bot Automatizado de Mensagens');
-        console.log('=================================\n');
-
         await this.connect();
 
         // Fazer login
         const loggedIn = await this.login();
         if (!loggedIn) {
-            console.error('Falha no login. Encerrando bot.');
             process.exit(1);
         }
 
@@ -231,13 +199,11 @@ class MessageBot {
 
 // Iniciar bot
 const bot = new MessageBot();
-bot.start().catch((error) => {
-    console.error('Erro fatal:', error);
+bot.start().catch(() => {
     process.exit(1);
 });
 
 // Tratamento de encerramento
 process.on('SIGINT', () => {
-    console.log('\nEncerrando bot...');
     process.exit(0);
 });
