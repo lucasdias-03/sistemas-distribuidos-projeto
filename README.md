@@ -112,8 +112,6 @@ sistemas-distribuidos-projeto/
 ├── on.py               # Script para iniciar sistema
 ├── off.py              # Script para parar sistema
 ├── status.py           # Script para verificar status
-├── PARTE4_RELOGIOS.md  # Documentação de relógios
-├── REPLICACAO.md       # Documentação de replicação
 └── README.md           # Este arquivo
 ```
 
@@ -163,7 +161,7 @@ sistemas-distribuidos-projeto/
 - Recebe heartbeats periódicos
 - Remove servidores inativos (>30s sem heartbeat)
 
-## 🎮 Como Usar
+## Como Usar
 
 ### Iniciar Sistema
 
@@ -209,43 +207,6 @@ cat data/servidor_1/users.json
 cat data/servidor_2/users.json
 cat data/servidor_3/users.json
 
-# Devem ser IGUAIS!
-```
-
-### Testar Falha de Servidor
-
-```bash
-# 1. Sistema rodando normalmente
-python status.py
-
-# 2. Parar coordenador (servidor_3)
-docker stop servidor_3
-
-# 3. Ver logs de reeleição
-docker logs servidor_2 | grep ELEIÇÃO
-
-# 4. Fazer operações
-
-# 5. Reiniciar servidor
-docker start servidor_3
-
-# 6. Ver sincronização
-docker logs servidor_3 | grep SYNC
-```
-
-### Ver Logs em Tempo Real
-
-```bash
-# Todos os serviços
-docker-compose logs -f
-
-# Servidor específico
-docker logs -f servidor_1
-
-# Filtrar por tipo
-docker logs servidor_1 | grep REPLICAÇÃO
-docker logs servidor_3 | grep BERKELEY
-docker logs servidor_2 | grep ELEIÇÃO
 ```
 
 ## 📊 Monitoramento
@@ -425,20 +386,13 @@ python status.py
 
 # Ver logs de Berkeley
 docker logs servidor_3 | grep BERKELEY
-
-# Contador de mensagens (sincroniza a cada 10)
-# Fazer mais operações para trigger
 ```
 
-## 📚 Documentação Adicional
-
-- **[REPLICACAO.md](REPLICACAO.md)**: Detalhes do protocolo de replicação
-- **[PARTE4_RELOGIOS.md](PARTE4_RELOGIOS.md)**: Relógios lógicos e físicos, eleição
 
 ## 🛠️ Tecnologias Utilizadas
 
 - **Broker/Proxy**: Go + ZeroMQ
-- **Servidores/Referência**: Python 3 + ZeroMQ + MessagePack
+- **Servidores/Referência**: Python + ZeroMQ + MessagePack
 - **Cliente/Bots**: Node.js + ZeroMQ + MessagePack
 - **Containerização**: Docker + Docker Compose
 - **Persistência**: JSON (arquivos locais)
@@ -460,7 +414,7 @@ docker logs servidor_3 | grep BERKELEY
 
 Ao executar o sistema:
 
-1. **Eleição**: servidor_3 (maior rank) torna-se coordenador
+1. **Eleição**: servidor com maior rank torna-se coordenador
 2. **Replicação**: Todas as operações replicadas em todos os servidores
 3. **Consistência**: Dados idênticos em `data/servidor_1/`, `data/servidor_2/`, `data/servidor_3/`
 4. **Berkeley**: Coordenador sincroniza relógios a cada 10 mensagens
